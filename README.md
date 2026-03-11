@@ -5,8 +5,8 @@
 
 | 이름 (Name) | 역할 (Role) | 담당 업무 (Contributions) | GitHub 프로필 |
 | :---: | :---: | :--- | :---: |
-| 윤훈 | 팀장 / Back-End,Front-End,DB | - 메인페이지 구현, 기획, 페이지별 기능구현, 식품안전나라 api 정보 가공 및 필터링 | [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/아이디) |
-| 한재승 | 팀원 / Back-End,Front-End | - api를 사용한 길찾기 기능 구현, 경로 안내 기능 구현,   | [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/아이디) |
+| 윤훈 | 팀장 / Back-End,Front-End,DB | - 메인페이지 구현, 기획, 페이지별 기능구현, 식품안전나라 api 정보 가공 및 필터링 | [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/yunhoon0206) |
+| 한재승 | 팀원 / Back-End,Front-End | - api를 사용한 길찾기 기능 구현, 경로 안내 기능 구현,   | [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/koo06101) |
 | 권순혁 | 팀원 /Back-End,Front-End,DB | DB제작, 냉장고 와 DB간의 연결 기눙 구현, 냉장고 페이지 제작   | [![GitHub](https://img.shields.io/badge/GitHub-Profile-181717?logo=github)](https://github.com/아이디) |
 
 
