@@ -1,0 +1,304 @@
+package com.dongyang.foodpage.util;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import com.dongyang.foodpage.dto.FoodDTO;
+import com.dongyang.foodpage.dto.ParsedIngredientDTO;
+import java.util.Collections;
+import java.util.Arrays;
+
+public class RecipeUtil {
+
+    // 제외할 레시피 이름 목록 (벤 리스트)
+    private static final List<String> BAN_LIST = Collections.unmodifiableList(Arrays.asList(
+        "새우두부계란찜"	,"에멘탈 치즈 퐁듀"
+    ));
+
+    public static boolean isBanned(String name) {
+        if (name == null) return false;
+        return BAN_LIST.contains(name.trim());
+    }
+
+    public static String calculateTotalCookingTime(List<String> manuals) {
+        if (manuals == null || manuals.isEmpty()) {
+            return "정보 없음";
+        }
+
+        int totalMinutes = manuals.size(); // 기본 1분씩
+        Pattern minutePattern = Pattern.compile("(\\d+)(?:~(\\d+))?\\s*분");
+        Pattern hourPattern = Pattern.compile("(\\d+)(?:~(\\d+))?\\s*시간");
+        
+        String[] shortTimeKeywords = {"약간", "데친", "살짝", "잠깐", "끓여", "볶아", "끓인", "손질", "볶고"}; // 2분
+        String[] mediumTimeKeywords = {"푹", "오래", "은근히", "졸여", "조린", "졸인"}; // 5분
+        String[] longTimeKeywords = {"육수", "쪄서", "불린", "숙성"}; // 20분
+
+        for (String step : manuals) {
+            boolean timeFoundInStep = false;
+            boolean mediumTimeKeywordFound = false;
+            boolean longTimeKeywordFound = false;
+
+            Matcher minuteMatcher = minutePattern.matcher(step);
+            while (minuteMatcher.find()) {
+                String minStr = minuteMatcher.group(2) != null ? minuteMatcher.group(2) : minuteMatcher.group(1);
+                totalMinutes += Integer.parseInt(minStr);
+                timeFoundInStep = true;
+            }
+
+            Matcher hourMatcher = hourPattern.matcher(step);
+            while (hourMatcher.find()) {
+                String hourStr = hourMatcher.group(2) != null ? hourMatcher.group(2) : hourMatcher.group(1);
+                totalMinutes += Integer.parseInt(hourStr) * 60;
+                timeFoundInStep = true;
+            }
+            
+            if (!timeFoundInStep) { 
+                for (String keyword : shortTimeKeywords) {
+                    if (step.contains(keyword)) {
+                        totalMinutes += 2;
+                        timeFoundInStep = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!timeFoundInStep && !mediumTimeKeywordFound) { 
+                for (String keyword : mediumTimeKeywords) {
+                    if (step.contains(keyword)) {
+                        totalMinutes += 5;
+                        mediumTimeKeywordFound = true;
+                        timeFoundInStep = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (!timeFoundInStep && !longTimeKeywordFound) { 
+                for (String keyword : longTimeKeywords) {
+                    if (step.contains(keyword)) {
+                        totalMinutes += 20;
+                        longTimeKeywordFound = true;
+                        timeFoundInStep = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (totalMinutes == 0) return "정보 없음";
+        
+        if (totalMinutes >= 60) {
+            int h = totalMinutes / 60;
+            int m = totalMinutes % 60;
+            return m > 0 ? h + "시간 " + m + "분" : h + "시간";
+        } else {
+            return totalMinutes + "분";
+        }
+    }
+
+    public static List<String> parseManualsFromJson(JSONObject item) {
+        List<String> manuals = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            String manualKey = String.format("MANUAL%02d", i);
+            String manualText = (String) item.get(manualKey);
+            if (manualText != null && !manualText.trim().isEmpty()) {
+                manualText = manualText.replaceAll("^\\d+\\.\\s*", "");
+                manuals.add(manualText);
+            }
+        }
+        return manuals;
+    }
+
+    public static int parseTimeInMinutes(String timeStr) {
+        if (timeStr == null) return 0;
+        int total = 0;
+        try {
+            if (timeStr.contains("시간")) {
+                String[] parts = timeStr.split("시간");
+                String hourPart = parts[0].replaceAll("[^0-9]", "");
+                if (!hourPart.isEmpty()) total += Integer.parseInt(hourPart) * 60;
+                
+                if (parts.length > 1) {
+                    String minPart = parts[1].replaceAll("[^0-9]", "");
+                    if (!minPart.isEmpty()) total += Integer.parseInt(minPart);
+                }
+            } else {
+                String minPart = timeStr.replaceAll("[^0-9]", "");
+                if (!minPart.isEmpty()) total += Integer.parseInt(minPart);
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+        return total;
+    }
+
+    public static FoodDTO parseJsonToFoodDTO(String json) {
+        if (json == null || json.isEmpty() || json.contains("error")) return null;
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) parser.parse(json);
+            JSONObject cookRcp = (JSONObject) jsonObj.get("COOKRCP01");
+            if (cookRcp == null) return null;
+            JSONArray row = (JSONArray) cookRcp.get("row");
+            if (row == null || row.isEmpty()) return null;
+
+            return createFoodDTOFromJsonObject((JSONObject) row.get(0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<FoodDTO> parseJsonToFoodList(String json) {
+        List<FoodDTO> list = new ArrayList<>();
+        if (json == null || json.isEmpty()) return list;
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObj = (JSONObject) parser.parse(json);
+            JSONObject cookRcp = (JSONObject) jsonObj.get("COOKRCP01");
+            if (cookRcp == null) return list;
+            JSONArray row = (JSONArray) cookRcp.get("row");
+            if (row == null) return list;
+
+            for (int i = 0; i < row.size(); i++) {
+                FoodDTO foodDTO = createFoodDTOFromJsonObject((JSONObject) row.get(i));
+                if (foodDTO != null) list.add(foodDTO);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    private static FoodDTO createFoodDTOFromJsonObject(JSONObject item) {
+        String name = (String) item.get("RCP_NM");
+        String img = (String) item.get("ATT_FILE_NO_MAIN");
+        String rcpSeq = (String) item.get("RCP_SEQ");
+        String ingredients = null; // API 재료 데이터는 사용하지 않음
+        String category = (String) item.get("RCP_PAT2");
+
+        if (name == null) name = "이름 없음";
+        
+        if (img == null || img.isEmpty()) img = "images/default.jpg";
+        if (rcpSeq == null) rcpSeq = "";
+
+        if (isBanned(name)) return null;
+
+        List<String> manuals = parseManualsFromJson(item);
+        String calculatedTime = calculateTotalCookingTime(manuals);
+
+        FoodDTO foodDTO = new FoodDTO(name, calculatedTime, img, rcpSeq);
+        foodDTO.setManuals(manuals);
+        foodDTO.setCategory(category);
+        // foodDTO.setIngredients(ingredients); // API 재료 설정 로직 제거
+        // foodDTO.setParsedIngredients(parseIngredients(ingredients, name)); // API 재료 파싱 로직 제거
+        
+        return foodDTO;
+    }
+
+    /**
+     * DB 데이터 형식에 맞춘 재료 파싱 로직
+     * 규칙 1. 콤마(,)로 재료 구분
+     * 규칙 2. "-그룹명 :" 형태로 그룹 구분
+     * 규칙 3. 마지막 공백( )을 기준으로 [이름] [용량] 구분
+     */
+    public static List<ParsedIngredientDTO> parseIngredients(String text, String dishName) {
+        List<ParsedIngredientDTO> list = new ArrayList<>();
+        if (text == null || text.isEmpty()) return list;
+
+        String[] tokens = text.split(",");
+        String currentGroup = "주재료"; // 기본 그룹
+
+        for (String token : tokens) {
+            token = token.trim();
+            if (token.isEmpty()) continue;
+
+            // --- 그룹 감지 로직 (-그룹명 :) ---
+            if (token.startsWith("-") && token.contains(":")) {
+                int colonIndex = token.indexOf(":");
+                // "-양념 :" -> "양념"
+                String groupName = token.substring(1, colonIndex).trim();
+                if (!groupName.isEmpty()) {
+                    currentGroup = groupName;
+                }
+
+                // 그룹 선언 뒤에 재료가 붙어있는 경우 처리
+                // 예: "-양념 : 간장 1T"
+                if (token.length() > colonIndex + 1) {
+                    token = token.substring(colonIndex + 1).trim();
+                } else {
+                    // 그룹만 선언된 경우 다음 토큰으로
+                    continue;
+                }
+            }
+
+            if (token.isEmpty()) continue;
+
+            // --- 이름 및 용량 분리 로직 (마지막 공백 기준) ---
+            String name = token;
+            String rawAmount = "";
+            
+            int lastSpace = token.lastIndexOf(" ");
+            if (lastSpace > 0) {
+                // "돼지고기 200g" -> name="돼지고기", rawAmount="200g"
+                name = token.substring(0, lastSpace).trim();
+                rawAmount = token.substring(lastSpace + 1).trim();
+            } else {
+                // 공백이 없으면 전체를 이름으로
+                name = token;
+                rawAmount = "";
+            }
+
+            // 요리 이름이 재료 목록에 포함된 경우 제외
+            if (name.equals(dishName.trim())) continue;
+
+            // --- 수치(quantity) 및 단위(unit) 파싱 ---
+            double quantity = 0.0;
+            String unit = "";
+
+            if (!rawAmount.isEmpty()) {
+                // 숫자로 시작하는지 확인하여 수치와 단위 분리
+                // 예: "200g" -> 200, g
+                // 예: "1/2개" -> 0.5, 개
+                Matcher m = Pattern.compile("^([0-9./]+)(.*)$").matcher(rawAmount);
+                if (m.find()) {
+                    String numStr = m.group(1);
+                    String unitStr = m.group(2).trim();
+                    
+                    quantity = parseQuantity(numStr);
+                    unit = unitStr;
+                } else {
+                    // 숫자가 없으면(예: "약간") 단위로만 처리
+                    unit = rawAmount;
+                }
+            } else {
+                unit = "적당량"; // 용량이 명시되지 않음
+            }
+
+            list.add(new ParsedIngredientDTO(name, rawAmount, currentGroup, quantity, unit));
+        }
+        return list;
+    }
+
+    // 분수(1/2) 또는 소수(0.5) 문자열을 double로 변환
+    private static double parseQuantity(String numStr) {
+        try {
+            if (numStr.contains("/")) {
+                String[] parts = numStr.split("/");
+                if (parts.length == 2) {
+                    double n = Double.parseDouble(parts[0]);
+                    double d = Double.parseDouble(parts[1]);
+                    return (d != 0) ? n / d : 0.0;
+                }
+            }
+            return Double.parseDouble(numStr);
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+}

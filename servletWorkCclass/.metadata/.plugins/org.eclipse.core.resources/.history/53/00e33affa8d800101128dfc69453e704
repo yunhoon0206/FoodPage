@@ -1,0 +1,1047 @@
+@charset "UTF-8";
+
+body {
+    font-family: '맑은 고딕', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* 레이아웃 컨테이너 */
+.page-container {
+    display: flex;
+    max-width: 1400px;
+    width: 90%;
+    margin: 20px auto;
+    gap: 20px;
+    padding: 0 20px;
+}
+
+/* 좌측 사이드바 */
+.sidebar {
+    width: 200px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+.sidebar button {
+    display: block;
+    width: 100%;
+    padding: 15px 10px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: bold;
+    color: #333;
+    transition: background 0.3s;
+}
+
+.sidebar button:hover {
+    background-color: #e9ecef;
+}
+
+.sidebar button.active {
+    background-color: #2C3E50;
+    color: white;
+    border-color: #2C3E50;
+}
+
+/* 우측 컨텐츠 영역 */
+.content-area {
+    flex: 1;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 40px;
+    min-height: 600px;
+}
+
+/* 기존 스타일 유지 및 수정 */
+.main-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-section {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-box-wide {
+    width: 100%;
+    padding: 20px;
+    background-color: transparent;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.search-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    justify-content: center;
+}
+
+.search-list li {
+    text-align: left;
+}
+
+.search-list label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+}
+
+.search-list input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.search-bar-box {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    padding: 4px;
+    margin-top: 20px;
+}
+
+.search-bar-box input {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    font-size: 14px;
+    outline: none;
+    background-color: transparent;
+}
+
+.search-bar-box button {
+    padding: 6px 12px;
+    font-size: 13px;
+    background-color: #E07A5F;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 추천 섹션 스타일 */
+.recommend-section {
+    width: 100%;
+    margin-top: 40px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 30px;
+}
+
+.recommend-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.recommend-list li {
+    width: 330px;
+}
+
+.recommend-card {
+    background-color: #F5F5DC;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    height: 420px; /* 고정 높이 설정 */
+    overflow: hidden;
+    justify-content: space-between;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.recommend-content {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.image-box {
+    background-color: #ddd;
+    height: 320px; /* 고정 높이 설정 */
+    width: 100%;
+    border-radius: 6px;
+    border: 5px solid #C8C3A0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-sizing: border-box; /* 테두리 포함 */
+}
+
+/* 로그인/회원가입 페이지 스타일 */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+    min-height: calc(100vh - 140px);
+}
+
+.auth-box {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.auth-box h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 24px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.auth-form input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.auth-form input:focus {
+    border-color: #E07A5F;
+}
+
+.auth-form button {
+    padding: 12px;
+    background-color: #E07A5F;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+.auth-form button:hover {
+    background-color: #D0694E;
+}
+
+.auth-links {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.auth-links a {
+    color: #666;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.auth-links a:hover {
+    color: #E07A5F;
+    text-decoration: underline;
+}
+
+/* ===============================
+   마이페이지 내 주소 검색 필드 스타일
+   =============================== */
+.auth-form .input-wrapper {
+    display: flex;
+    align-items: center; /* 내부 요소를 수직 중앙 정렬 */
+    padding: 12px; /* .auth-form input과 동일한 수직 패딩 적용 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    position: relative;
+    width: 100%;
+}
+
+.auth-form .input-wrapper input {
+    flex-grow: 1;
+    border: none;
+    padding: 0; /* input 자체의 패딩 제거, input-wrapper가 패딩을 담당 */
+    padding-right: 60px; /* 버튼 공간 확보 */
+    outline: none;
+    background-color: transparent;
+    font-size: 14px;
+    height: auto; /* 높이 자동 조절 */
+}
+
+.auth-form .input-wrapper button {
+    position: absolute;
+    right: 5px;
+    top: 50%; /* 원래 중앙 정렬로 복구 */
+    transform: translateY(-50%); /* 원래 중앙 정렬로 복구 */
+    padding: 5px 10px;
+    border: none;
+    background-color: #eee;
+    color: #333;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.auth-form .input-wrapper button:hover {
+    background-color: #ddd;
+}
+/* ===============================
+   냉장고 페이지 전체 스타일
+   =============================== */
+
+/* 페이지 제목 중앙 정렬 */
+.page-title {
+    text-align: center;
+    padding: 30px 0;
+}
+
+/* 냉장고 전체 컨테이너 - 2x2 그리드 적용 */
+.fridge-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2열 */
+    grid-template-rows: repeat(2, auto);  /* 2행, 내용에 따라 높이 자동 */
+    gap: 20px;                            /* 각 섹션 간격 */
+    width: 90%;
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 20px;
+    border: 3px solid #e0e0e0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-top : 0px;
+}
+
+/* 각 섹션 (식재료, 조미료, 추가, 소모) */
+.fridge-section {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+}
+
+/* ===============================
+   재료/조미료 목록 스타일
+   =============================== */
+
+/* 리스트 기본 스타일 제거 */
+.fridge-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    /* 2열 그리드 적용 */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2열 */
+    gap: 8px 16px;                         /* 세로 8px, 가로 16px */
+}
+
+/* 각 재료 항목 */
+
+.fridge-section li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 🔥 다시 중앙 정렬로 복귀 */
+}
+
+.fridge-section li span {
+    display: inline-block;
+    font-size: 14px;
+    line-height: 22px; /* 버튼 높이와 맞춤 */
+}
+
+.fridge-section li form {
+    display: flex;
+    align-items: center; /* 🔥 버튼을 텍스트 기준선에 맞춤 */
+}
+
+/* 재료 리스트 공통 스타일 */
+.ingredients-section li,
+.seasoning-section li {
+    cursor: pointer;        /* 손가락 커서 */
+    user-select: none;      /* 텍스트 드래그 불가 */
+    padding: 6px 4px;
+}
+
+/* hover 시 강조 효과 */
+.ingredients-section li:hover,
+.seasoning-section li:hover {
+    background: #f2f2f2;
+    border-radius: 6px;
+}
+
+.qty-text {
+    cursor: default;         /* 🔧 텍스트 커서 제거 */
+    user-select: none;       /* 🔧 드래그 선택 방지 */
+}
+
+
+
+/* ===============================
+   재료 추가 / 감소 폼 스타일
+   =============================== */
+
+/* 공통 폼 컨테이너 */
+.add-ingredient-form,
+.reduce-ingredient-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* 폼 내부 입력창 / 선택박스 */
+.add-ingredient-form input,
+.add-ingredient-form select,
+.reduce-ingredient-form input,
+.reduce-ingredient-form select {
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+/* 폼 버튼 */
+.add-ingredient-form button,
+.reduce-ingredient-form button {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #E07A5F; /* 주황색 버튼 */
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    margin-top : 25px;
+    
+}
+
+/* 버튼 hover 시 색상 변경 */
+.add-ingredient-form button:hover,
+.reduce-ingredient-form button:hover {
+    background: #D0694E; /* 진한 주황색 */
+}
+
+/* ===============================
+   섹션별 여백 통일
+   =============================== */
+.ingredients-section,
+.seasoning-section,
+.add-section,
+.reduce-section {
+    margin-bottom: 0;
+}
+
+.delete-btn {
+    background: #f5f5f5;
+    color: #e07a5f;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    flex-shrink: 0;
+
+    /* 🔥 아래로 강제 이동 */
+    position: relative;
+    top: 0px; /* 원하는 만큼 조절  */
+}
+
+
+
+.delete-btn:hover {
+    background: #e07a5f;
+    color: white;
+}
+
+
+/* 관리자 페이지 전체 컨테이너 */
+.admin-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 40px 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    min-height: 500px;
+}
+
+/* 회원 목록 테이블 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 15px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-table th {
+    background-color: #2C3E50;
+    color: white;
+    font-weight: bold;
+}
+
+.data-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.btn-del {
+    padding: 6px 12px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.btn-edit {
+    padding: 6px 12px;
+    background-color:#3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-edit:hover {
+    background-color: #2980b9;
+}
+.btn-del:hover {
+    background-color: #c0392b;
+}
+
+/* 헤더 영역 */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.admin-header h2 {
+    margin: 0;
+    color: #333;
+}
+
+/* 신규 회원 추가 박스 */
+.add-user-box {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.add-user-box label {
+    font-weight: bold;
+    color: #333;
+}
+
+.add-user-box input,
+.add-user-box select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.add-user-box button {
+    align-self: flex-start;
+    padding: 8px 16px;
+    background-color: #E07A5F;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.add-user-box button:hover {
+    background-color: #D0694E;
+}
+
+/* ===============================
+   레시피 상세 페이지 스타일 (공통)
+   =============================== */
+
+.recipe-detail-container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.recipe-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.recipe-title {
+    font-size: 2em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.recipe-meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.ingredients-section h3, .manuals-section h3, .route-section h3 {
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.ingredients-list {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 5px;
+    line-height: 1.8;
+}
+
+.manuals-list {
+    list-style: none;
+    padding: 0;
+}
+
+.manuals-list li {
+    background-color: #fcfcfc;
+    border: 1px solid #e7e7e7;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    line-height: 1.6;
+    display: flex;
+    align-items: flex-start;
+}
+
+.manuals-list li strong {
+    font-size: 1.2em;
+    color: #ff6600;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+/* 이동 경로 스타일 */
+.route-path {
+    background-color: #e9f7ef;
+    border: 1px solid #c8e6c9;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.route-total-time {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 10px;
+}
+
+.route-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.route-steps li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #d4edda;
+    display: flex;
+    align-items: center;
+}
+
+.route-steps li:last-child {
+    border-bottom: none;
+}
+
+.route-steps .icon {
+    margin-right: 10px;
+    color: #28a745;
+    font-size: 1.2em;
+    width: 20px;
+    text-align: center;
+}
+
+.route-steps .step-info {
+    flex-grow: 1;
+}
+
+.route-steps .step-time {
+    font-weight: bold;
+    color: #333;
+}
+
+.mart-info {
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* 파싱된 재료 리스트 스타일 */
+.parsed-ingredient-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.parsed-ingredient-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95em;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.ing-name {
+    font-weight: bold;
+    color: #333;
+}
+
+.ing-amount {
+    color: #ff5722;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+/* 알레르기 경고 스타일 */
+.allergy-warning-banner {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ef9a9a;
+    margin-bottom: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.allergy-icon {
+    font-size: 1.2em;
+    margin-left: 5px;
+    cursor: help;
+}
+
+/* 마트 추천 박스 스타일 */
+.mart-recommend-box {
+    background: #fff3e0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #ffe0b2;
+}
+
+.mart-recommend-title {
+    margin-top: 0;
+    color: #e65100;
+    border-bottom: none !important;
+}
+
+/* ===============================
+   한상 차림 상세 페이지 스타일
+   =============================== */
+.course-container {
+    display: flex;
+    max-width: 1400px; /* page-container와 맞춤 */
+    margin: 20px auto;
+    gap: 20px;
+    padding: 0 20px; /* page-container와 패딩 맞춤 */
+}
+
+.course-sidebar {
+    width: 375px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    height: fit-content;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.course-content {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    padding: 40px; /* content-area와 유사하게 */
+}
+
+.course-menu-item {
+    display: block;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    background-color: #fcfcfc;
+}
+
+.course-menu-item:hover {
+    background-color: #f0f0f0;
+    transform: translateX(5px);
+}
+
+.course-menu-item.active {
+    background-color: #e3f2fd;
+    border-color: #2196F3;
+    color: #1976D2;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.time-badge {
+    font-size: 0.85em;
+    color: #666;
+    float: right;
+    background: #fff;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+.course-sidebar h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+/* 한상 차림 카드 리스트 스타일 */
+.han-sang-list {
+    list-style: none;
+    padding: 0 !important; /* 강제 적용 */
+    margin: 0;
+    text-align: left;
+    width: 100%; /* 너비 꽉 채우기 */
+}
+
+.han-sang-list li {
+    margin-bottom: 5px;
+    font-size: 14px;
+    padding-left: 5px; /* 약간의 들여쓰기 */
+    display: flex; /* Flexbox 사용 */
+    justify-content: space-between; /* 양끝 정렬 */
+    align-items: center;
+}
+
+/* ===============================
+   히스토리(최근 본 레시피) 스타일
+   =============================== */
+.history-container {
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.history-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.history-item:hover {
+    background-color: #f9f9f9;
+}
+.history-item:last-child {
+    border-bottom: none;
+}
+.history-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+.history-content {
+    flex-grow: 1;
+}
+.history-content h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1.2em;
+}
+.history-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+.history-date {
+    font-size: 0.8em;
+    color: #999;
+    margin-left: 15px;
+    white-space: nowrap; /* 날짜가 줄바꿈되지 않도록 */
+}
+
+/* ===============================
+   마이페이지 스타일
+   =============================== */
+.info-list {
+    text-align: left;
+    margin-bottom: 30px;
+    padding: 0 20px;
+}
+.info-list p {
+    margin: 10px 0;
+    font-size: 15px;
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.info-list span {
+    font-weight: bold;
+    color: #333;
+}
+.divider {
+    border-top: 1px solid #eee;
+    margin: 20px 0;
+}
+.section-title {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: left;
+    padding-left: 10px;
+    border-left: 4px solid #E07A5F;
+}
+
+/* 검색 입력 필드 래퍼 스타일 */
+.input-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+.input-wrapper input {
+    width: 100%;
+    padding-right: 60px; /* 버튼 공간 확보 */
+    box-sizing: border-box;
+}
+.input-wrapper button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 5px 10px;
+    height: 30px;
+    border: none;
+    background-color: #eee;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+.input-wrapper button:hover {
+    background-color: #ddd;
+}
+
+/* 시간 입력 필드 스타일 */
+.time-wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc; /* 다른 입력 필드와 유사한 테두리 */
+    border-radius: 4px; /* 둥근 모서리 */
+    background-color: #fff;
+    padding: 4px 8px; /* 내부 여백 */
+}
+
+.time-wrapper input[type="time"] {
+    flex: 1;
+    border: none; /* 내부 input 테두리 제거 */
+    outline: none; /* 포커스 시 외곽선 제거 */
+    font-family: inherit; /* 폰트 상속 */
+    font-size: 14px;
+    padding: 4px;
+    padding-right: 0 !important; /* 기존 input-wrapper의 padding-right 재정의 */
+    background: transparent;
+}
+
+.time-icon {
+    font-size: 1.2em;
+    margin-right: 8px;
+    color: #666;
+    user-select: none;
+}

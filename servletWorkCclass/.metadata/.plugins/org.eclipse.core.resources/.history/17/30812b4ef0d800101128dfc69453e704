@@ -1,0 +1,91 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8" isErrorPage="true"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>오류 발생</title>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/common/style.css">
+<style>
+    .error-container {
+        text-align: center;
+        padding: 50px;
+        margin-top: 50px;
+    }
+    .error-icon {
+        font-size: 50px;
+        color: #ff6b6b;
+        margin-bottom: 20px;
+    }
+    .error-feedback {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        border: 1px solid #eee;
+    }
+    .error-feedback h3 {
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-feedback textarea {
+        width: 80%;
+        min-height: 100px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        resize: vertical;
+        font-size: 1rem;
+        box-sizing: border-box; /* 패딩이 너비에 포함되도록 */
+    }
+    .error-feedback p.help-text {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 10px;
+    }
+    .btn-home {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #333;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+    .btn-home:hover {
+        background-color: #555;
+    }
+</style>
+</head>
+<body>
+    <jsp:include page="/common/header.jsp" />
+
+    <div class="error-container">
+        <div class="error-icon">⚠️</div>
+        <h2>죄송합니다. 오류가 발생했습니다.</h2>
+        <p>요청하신 페이지를 찾을 수 없거나, 시스템에 문제가 발생했습니다.</p>
+        <p>잠시 후 다시 시도해주세요.</p>
+        
+        <div class="error-feedback">
+            <h3>오류를 해결하는 데 도움을 주세요!</h3>
+            <p>어떤 상황에서 오류가 발생했는지 알려주시면,<br>더 나은 서비스를 제공하는 데 큰 도움이 됩니다.</p>
+            <textarea placeholder="예: '로그인 후 마이페이지 버튼 클릭 시', 'XX 레시피 검색 중' 등 상세하게 입력해주세요. (입력된 내용은 저장되지 않습니다.)"></textarea>
+            <p class="help-text">이 정보는 개발팀에게 전달되지 않으며, 문제 해결을 돕기 위한 예시 문구입니다.</p>
+        </div>
+
+        <%-- 개발 중에만 실제 에러 내용을 봅니다. 배포 시에는 주석 처리하는 것이 좋습니다. --%>
+        <% 
+            if (exception != null) {
+        %>
+            <div style="margin-top: 30px; text-align: left; background: #f0f0f0; padding: 15px; border-radius: 5px; overflow: auto;">
+                <strong>Error Details (For Developer):</strong><br>
+                <%= exception.getClass().getName() %>: <%= exception.getMessage() %>
+            </div>
+        <% 
+            }
+        %>
+
+        <a href="${pageContext.request.contextPath}/index.jsp" class="btn-home">홈으로 돌아가기</a>
+    </div>
+</body>
+</html>

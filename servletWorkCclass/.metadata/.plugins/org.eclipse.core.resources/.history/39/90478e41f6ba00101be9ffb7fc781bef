@@ -1,0 +1,40 @@
+<%@page import="com.dongyang.example1.MemberDTO"%>
+<%@page import="java.util.*"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>회원목록</title>
+</head>
+<body>
+<%@ include file = "header.jsp" %>
+<h1> 회원목록 </h1>
+
+<% ArrayList<MemberDTO> dto= (ArrayList<MemberDTO>)request.getAttribute("memList");
+if(dto == null){
+	response.sendRedirect("index.jsp");
+}
+else{
+	out.println("<table border =1>");
+	out.println("<tr>");
+	out.println("<td>아이디</td><td>암호</td><td>이름</td><td>이메일</td>");
+	out.println("</tr>");
+		
+	for(MemberDTO dtoItem : dto){
+		out.println("<tr>");
+		out.println("<td>" + dtoItem.getMemberid()+"/<td>");
+		out.println("<td>" + dtoItem.getPassword()+"/<td>");
+		out.println("<td>" + dtoItem.getName()+"/<td>");
+		out.println("<td>" + dtoItem.getEamil()+"/<td>");
+		out.println("</tr>");
+		
+	}
+	out.println("</table>");
+}
+
+%>
+</body>
+</html>

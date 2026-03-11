@@ -1,0 +1,162 @@
+package com.dongyang.foodpage.controller;
+
+import com.dongyang.foodpage.dto.RouteResultDTO;
+import com.dongyang.foodpage.service.OdsayRouteService;
+import com.dongyang.foodpage.dto.FoodDTO;
+import com.dongyang.foodpage.util.FoodApiHelper;
+import com.dongyang.foodpage.util.RecipeUtil;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession; // 추가
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.util.Map;
+import java.sql.SQLException;
+
+import com.dongyang.foodpage.dao.FridgeDAO; 
+import com.dongyang.foodpage.dao.MemberDAO;
+import com.dongyang.foodpage.dto.FridgeItemDTO; 
+import com.dongyang.foodpage.dto.MemberDTO; 
+import com.dongyang.foodpage.dto.ParsedIngredientDTO; 
+
+@WebServlet("/courseDetail.do") //search.do 를 실행후 
+public class CourseDetailController extends HttpServlet {
+    
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String setId = req.getParameter("setId"); // 호출한 부분의 아이디를 가져와서 setid로 저장
+        String menusParam = req.getParameter("menus");// 호출한부분의 menus를 가져와서 menusParam으로 저장
+        List<FoodDTO> courseList = null; // 아래에서쓸 리스트를 미리선언 
+
+        // 1. 세션 캐시 확인 (우선순위)
+        if (setId != null && !setId.isEmpty()) { // 아이디가 무슨값이 들어있고, null이아닐경우 실행 ->isEmpty 는 공백을 확인한다 
+            Map<String, List<FoodDTO>> cache = (Map<String, List<FoodDTO>>) req.getSession().getAttribute("hanSangCache"); //세션정보에 접근해서 해당이름의 데이터를 가져와서변수에 넣는다
+            if (cache != null) { //저장에 성공하면 실행
+                courseList = cache.get(setId); // 리스트에 setId를 가져와서 넣음
+            }
+        }
+
+        // 2. 캐시가 없으면 API 호출 (백업 로직)
+        if (courseList == null && menusParam != null && !menusParam.isEmpty()) { // 리스트가 비어있고 menus가 있고 null이아닐경우 실행. 위에서 파라미터를 가져왓기에 무었인가 들어있어야한마 
+            courseList = new ArrayList<>(); // 재정의 요리목록을 담기위함 여기선 5개의 요리를 담아야하기때문
+            String[] menuNames = menusParam.split(",");//문자열배열로서 가져온 값들에대해 , 로 구분을 한다
+            
+            for (String name : menuNames) {
+                if (name == null || name.trim().isEmpty()) continue;
+                
+                // 각 메뉴에 대해 상세 검색 (API 호출)
+                String jsonResult = FoodApiHelper.searchRecipeDetail(name.trim());
+                FoodDTO food = RecipeUtil.parseJsonToFoodDTO(jsonResult);
+                if (food != null) {
+                    courseList.add(food);
+                }
+            }
+            // 시간순 정렬 (내림차순) - API 호출 시에만 수행 (캐시는 이미 정렬됨)
+            courseList.sort((f1, f2) -> RecipeUtil.parseTimeInMinutes(f2.getTime()) - RecipeUtil.parseTimeInMinutes(f1.getTime()));// 람다식 
+        }
+        
+        // 3. 재료 파싱 정보 확인 및 보강 (API 재료가 없으므로 DB에서 조회 필수)
+        if (courseList != null) {
+            com.dongyang.foodpage.dao.RecipeDAO recipeDAO = new com.dongyang.foodpage.dao.RecipeDAO();
+            for (FoodDTO food : courseList) {
+                try {
+                    String dbIngredients = recipeDAO.getIngredientsByMenuName(food.getName());
+                    if (dbIngredients != null && !dbIngredients.isBlank()) {
+                        food.setIngredients(dbIngredients);
+                        food.setParsedIngredients(RecipeUtil.parseIngredients(dbIngredients, food.getName()));
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        req.setAttribute("courseList", courseList);
+        
+        // 현재 선택된 메뉴 (기본값: 가장 긴 시간 = 첫 번째)
+        String activeName = req.getParameter("active");
+        FoodDTO activeFood = null;
+        
+        if (courseList != null && !courseList.isEmpty()) { // 리스트에서 사용자가 클릭한 요리르 찾음 한상차림에만 존재하는 부분
+            if (activeName != null && !activeName.isEmpty()) {
+                for (FoodDTO f : courseList) {
+                    if (f.getName().equals(activeName)) {
+                        activeFood = f;
+                        break;
+                    }
+                }
+            }
+            if (activeFood == null) { // 클릭한 메뉴가 없거나 처음들어왔으면 첫번째 요리를 다시 보여줌
+                activeFood = courseList.get(0);
+            }
+        }
+        
+        req.setAttribute("food", activeFood);
+        req.setAttribute("setId", setId); // JSP에서 링크 유지용으로 전달
+
+        // --- 로그인 사용자 정보 (냉장고, 알레르기) 가져오기 ---
+        HttpSession session = req.getSession();
+        String memberId = (String) session.getAttribute("id");
+        
+        if (memberId != null) {
+            try {
+                // 1. 냉장고 정보
+                FridgeDAO fridgeDAO = new FridgeDAO();
+                List<FridgeItemDTO> itemList = fridgeDAO.getFridgeList(memberId);
+                List<ParsedIngredientDTO> fridgeList = new ArrayList<>();
+                for(FridgeItemDTO item : itemList) {
+                    fridgeList.add(new ParsedIngredientDTO(item));
+                }
+                req.setAttribute("fridgeList", fridgeList);
+
+                // 2. 알레르기 정보
+                MemberDAO memberDAO = new MemberDAO();
+                MemberDTO member = memberDAO.findById(memberId);
+                if (member != null && member.getAllergy() != null && !member.getAllergy().isBlank()) {
+                    String[] allergies = member.getAllergy().split(",");
+                    List<String> allergyList = new ArrayList<>();
+                    for (String s : allergies) {
+                        allergyList.add(s.trim());
+                    }
+                    req.setAttribute("allergyList", allergyList);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        // -------------------------------------------------
+
+        // --- 경로 탐색 로직 추가 ---
+        String startAddress = req.getParameter("start");
+        String endAddress = req.getParameter("end");
+
+        List<RouteResultDTO> routeResults = new ArrayList<>();
+        if (startAddress != null && !startAddress.isEmpty() && endAddress != null && !endAddress.isEmpty()) {
+            System.out.println("[CourseDetailController] 경로 탐색 시작: " + startAddress + " -> " + endAddress);
+            routeResults = OdsayRouteService.getRouteTime(startAddress, endAddress);
+        } else {
+            System.out.println("[CourseDetailController] 경로 탐색 스킵: 출발지/도착지 정보 없음");
+        }
+        
+        if (routeResults != null && !routeResults.isEmpty()) {
+            req.setAttribute("routeResults", routeResults);
+            System.out.println("[CourseDetailController] 경로 탐색 성공. 결과 개수: " + routeResults.size());
+        } else {
+            req.setAttribute("routeResults", new ArrayList<RouteResultDTO>()); // 빈 리스트 전달
+            System.out.println("[CourseDetailController] 경로 정보를 찾을 수 없거나 결과가 비어있습니다.");
+        }
+
+        req.getRequestDispatcher("/food/recipe_detail.jsp").forward(req, resp);
+    }
+}

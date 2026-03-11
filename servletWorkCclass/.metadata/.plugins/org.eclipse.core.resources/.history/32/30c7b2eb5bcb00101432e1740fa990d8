@@ -1,0 +1,15 @@
+package com.dongyang.example1;
+
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
+
+@WebListener
+public class AppLifeListener implements ServletContextListener {
+    public void contextInitialized(ServletContextEvent sce)  { 
+    }
+
+    public void contextDestroyed(ServletContextEvent sce)  { 
+    }
+	
+}

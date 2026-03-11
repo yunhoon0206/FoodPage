@@ -1,0 +1,86 @@
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FoodPage</title>
+    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/style.css?v=1">
+</head>
+<body>
+
+    <!-- 상단 버튼 영역 -->
+    <div class="navbar">
+        <div class="nav-buttons-left">
+            <button>검색</button>
+            <button>냉장고</button>
+            <button>기록</button>
+        </div>
+        
+        <div class="nav-buttons-right">
+            <button>로그인</button>
+            <button>회원가입</button>
+            
+        </div>
+        
+    </div>
+
+    <!-- 본문 영역 -->
+    <div class="main-wrapper">
+        <section class="form-section">
+            <h2>검색 조건 입력</h2>
+            <div class="form-box-wide">
+                <ul class="search-list">
+                    <li><label>출발지</label><input type="text" name="departure" placeholder=" 안녕"></li><br>
+                    <li><label>도착지</label><input type="text" name="destination"></li><br>
+                    <li><label>주재료</label><input type="text" name="ingredient"></li><br>
+                    <li><label>인원</label><input type="text" name="people"></li><br>
+                    <li><label>유형</label><input type="text" name="type"></li>
+                </ul>
+
+                <div class="search-bar-box">
+                    <input type="text" name="keyword" placeholder="검색어 입력">
+                    <button type="submit">검색</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="recommend-section">
+            <h2>추천 결과</h2>
+            <ul class="recommend-list">
+                <li>
+                    <div class="recommend-card">
+                        <div class="recommend-content">추천1<br>소요시간 : 60분</div>
+                        <div class="image-box">
+                        	<img src="images/1.jpeg" alt="삼계탕">
+                        	
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="recommend-card">
+                        <div class="recommend-content">추천2<br>소요시간 : 40분</div>
+                        <div class="image-box">
+                        	<img src="images/2.jpeg" alt="김밥">
+                        	
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="recommend-card">
+                        <div class="recommend-content">추천3<br>소요시간 : 20분</div>
+                        <div class="image-box">
+                        	<img src="images/3.jpeg" alt="김치찌개">
+                        	
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- 하단 푸터 -->
+    <footer class="footer-bar">
+        <div class="footer-content"></div>
+    </footer>
+
+</body>
+</html>

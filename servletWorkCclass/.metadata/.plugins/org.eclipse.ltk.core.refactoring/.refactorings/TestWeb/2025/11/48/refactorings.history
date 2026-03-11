@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move 5 packages to &apos;FoodPage/src/main/java&apos;&#x0D;&#x0A;- Original project: &apos;TestWeb&apos;&#x0D;&#x0A;- Destination element: &apos;FoodPage/src/main/java&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     TestWeb/src/dao&#x0D;&#x0A;     TestWeb/src/service&#x0D;&#x0A;     TestWeb/src/util&#x0D;&#x0A;     TestWeb/src/dto&#x0D;&#x0A;     TestWeb/src/controller&#x0D;&#x0A;- Update references to refactored element" description="Move packages" destination="=FoodPage/src\/main\/java" element1="/src&lt;dao" element2="/src&lt;service" element3="/src&lt;util" element4="/src&lt;dto" element5="/src&lt;controller" flags="589830" fragments="5" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.movePackages" stamp="1764122864307" version="1.0"/>
+</session>

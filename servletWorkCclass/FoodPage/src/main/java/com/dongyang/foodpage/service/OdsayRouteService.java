@@ -1,0 +1,225 @@
+package com.dongyang.foodpage.service;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.dongyang.foodpage.dto.*;
+
+public class OdsayRouteService {
+
+    private static final String ODSAY_KEY = "7+uF7IlUaqqMBInUkLVX+w"; // 본인 키 입력
+    private static final String KAKAO_KEY = "c8896e36de3feede2f8182834d059e13";
+
+    public static List<Map<String, String>> searchNearbyMarts(String address) {
+        List<Map<String, String>> martList = new ArrayList<>();
+        double[] coords = getGeoCoords(address); // 주소를 좌표로 변환
+
+        if (coords[0] < 0 || coords[1] < 0) return martList; // 좌표 변환 실패 시 빈 리스트 반환
+
+        try {
+            // Kakao Local API - Category Search (MT1: 대형마트)
+            // 반경 1000m 내 검색
+            String apiURL = "https://dapi.kakao.com/v2/local/search/category.json?category_group_code=MT1&x=" 
+                            + coords[1] + "&y=" + coords[0] + "&radius=1000&sort=distance";
+            
+            URL url = new URL(apiURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "KakaoAK " + KAKAO_KEY);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) sb.append(line);
+            br.close();
+
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(sb.toString());
+            JSONArray documents = (JSONArray) json.get("documents");
+
+            for (Object obj : documents) {
+                JSONObject doc = (JSONObject) obj;
+                Map<String, String> mart = new HashMap<>();
+                mart.put("place_name", (String) doc.get("place_name"));
+                mart.put("road_address_name", (String) doc.get("road_address_name"));
+                mart.put("phone", (String) doc.get("phone"));
+                mart.put("distance", (String) doc.get("distance")); // 거리 (미터 단위)
+                mart.put("x", (String) doc.get("x"));
+                mart.put("y", (String) doc.get("y"));
+                mart.put("place_url", (String) doc.get("place_url")); // 상세 페이지 URL
+                martList.add(mart);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return martList;
+    }
+
+    public static List<RouteResultDTO> getRouteTime(String startAddress, String endAddress)
+    {
+        double[] start = getGeoCoords(startAddress.equals("") ? "경기도 성남시 수내동 발이봉남로7번길" : startAddress);
+        if(start[0] < 0 || start[1] < 0) return null;
+        double[] end = getGeoCoords(endAddress.equals("서울특별시 구로구 경인로 445") ? "" : endAddress);
+        if(end[0] < 0 || end[1] < 0) return null;
+        
+        return getRouteTime(start[0], start[1], end[0], end[1]);
+    }
+
+    public static List<RouteResultDTO> getRouteTime(double startLat, double startLng, double endLat, double endLng) {
+        List<RouteResultDTO> results = new ArrayList<>();
+        try {
+            // 2. ODsay 경로 요청
+            String apiUrl = String.format(
+                    "https://api.odsay.com/v1/api/searchPubTransPathT?SX=%s&SY=%s&EX=%s&EY=%s&apiKey=%s",
+                    startLng, startLat, endLng, endLat, URLEncoder.encode(ODSAY_KEY, "UTF-8")
+            );
+ 
+            HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
+            conn.setRequestProperty("Referer", "http://localhost:8080");
+            conn.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) sb.append(line);
+            reader.close();
+
+            JSONParser parser = new JSONParser();
+            JSONObject response = (JSONObject) parser.parse(sb.toString());
+
+            JSONObject responseResult = (JSONObject) response.get("result");
+            if (responseResult == null) // error
+            {
+            	RouteResultDTO tooClose = new RouteResultDTO();
+            	tooClose.setTotalTime(0);
+            	List<PathDTO> paths = new ArrayList<PathDTO>();
+            	paths.add(new PathDTO(3, 0, "도착지가 700m 이내입니다.", "", "", ""));
+            	tooClose.setPaths(paths);
+            	
+            	results.add(tooClose);
+            	return results;
+            }
+            
+            JSONArray paths = (JSONArray) responseResult.get("path");
+
+            for (Object obj : paths)
+            {
+                results.add(convertOdsayToDTO((JSONObject)obj));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        return results;
+    }
+
+    public static double[] getGeoCoords(String address)
+    {
+    	double[] result = {-1, -1};
+
+        try {
+            String apiURL = "https://dapi.kakao.com/v2/local/search/address.json?query="
+            		+ URLEncoder.encode(address, "UTF-8");
+
+            URL url = new URL(apiURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Authorization", "KakaoAK " + KAKAO_KEY);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String line;
+            StringBuilder sb = new StringBuilder();
+
+            while ((line = br.readLine()) != null) sb.append(line);
+
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(sb.toString());
+            JSONArray documents = (JSONArray) json.get("documents");
+
+            if (documents.size() > 0) {
+                JSONObject obj = (JSONObject) documents.get(0);
+                double longitude = Double.parseDouble((String) obj.get("x"));
+                double latitude = Double.parseDouble((String) obj.get("y"));
+                return new double[]{latitude, longitude};
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    private static RouteResultDTO convertOdsayToDTO(JSONObject pathObj)
+    {
+    	RouteResultDTO result = new RouteResultDTO();
+    	
+    	JSONObject info = (JSONObject) pathObj.get("info");
+        result.setTotalTime(((Long) info.get("totalTime")).intValue());
+        
+        List<PathDTO> pathList = new ArrayList<>();
+
+        JSONArray subPaths = (JSONArray) pathObj.get("subPath");
+        for (Object o : subPaths)
+        {
+            JSONObject sp = (JSONObject) o;
+
+            int trafficType = ((Long) sp.get("trafficType")).intValue();
+            int sectionTime = ((Long) sp.get("sectionTime")).intValue();
+
+            String name = "도보";
+            String startName = (String) sp.get("startName");
+            String endName   = (String) sp.get("endName");
+            String laneInfo  = null;
+
+            switch(trafficType)
+            {
+            case 1: // 지하철
+            {
+            	JSONArray laneArr = (JSONArray) sp.get("lane");
+                if (laneArr != null && laneArr.size() > 0) {
+                    JSONObject lane = (JSONObject) laneArr.get(0);
+                    name = (String) lane.get("name"); // ex: "수도권 2호선"
+                    laneInfo = name;
+                }
+            }
+            break;
+            case 2:
+            {
+            	JSONArray laneArr = (JSONArray) sp.get("lane");
+                if (laneArr != null && laneArr.size() > 0) {
+                    JSONObject lane = (JSONObject) laneArr.get(0);
+                    name = (String) lane.get("busNo");
+                    laneInfo = name;
+                }
+            }
+            break;
+            default: //도보
+            break;
+            }
+
+            pathList.add(new PathDTO(
+                    trafficType,
+                    sectionTime,
+                    name,
+                    startName,
+                    endName,
+                    laneInfo
+            ));
+        }
+        
+        result.setPaths(pathList);
+        return result;
+    }
+}

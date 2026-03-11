@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="hasShownOverlayPopupBefore" value="true"/>
+	<section name="java.lang.Class">
+		<item key="replaceBarOpen" value="true"/>
+		<list key="findhistory">
+			<item value="responseResult"/>
+			<item value="recommen"/>
+			<item value=".auth-form .in"/>
+			<item value="data"/>
+			<item value="data_table"/>
+			<item value="ingredients"/>
+			<item value="div class=&quot;&lt;%= content"/>
+			<item value="div "/>
+			<item value="request.set"/>
+			<item value="if (food != null)"/>
+			<item value="Httpse"/>
+			<item value="parse"/>
+			<item value="compare"/>
+			<item value="한상"/>
+			<item value="list-style"/>
+		</list>
+		<list key="replacehistory">
+			<item value="email"/>
+		</list>
+	</section>
+</section>

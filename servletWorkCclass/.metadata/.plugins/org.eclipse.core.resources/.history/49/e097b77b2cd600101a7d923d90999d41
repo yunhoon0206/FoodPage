@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*, com.dongyang.foodpage.dto.FoodDTO, java.net.URLEncoder" %>
+<%  String mode = (String) request.getAttribute("mode");
+    if (mode == null) mode = request.getParameter("mode");
+    if (mode == null) mode = "1"; %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>메인 검색 페이지</title>
+<link rel="stylesheet" type="text/css" href="common/style.css?v=2">
+<script src="<%=request.getContextPath()%>/address/addrPopup.js"></script>
+</head>
+<body>
+    <jsp:include page="common/header.jsp" />
+    <div class="page-container">
+        <!-- 좌측 사이드바 -->
+        <div class="sidebar">
+            <button onclick="location.href='search.do?mode=1'" class="<%= "1".equals(mode) ? "active" : "" %>">키워드 검색</button>
+            <button onclick="location.href='search.do?mode=2'" class="<%= "2".equals(mode) ? "active" : "" %>">한상 차림 검색</button>
+            <button onclick="location.href='search.do?mode=3'" class="<%= "3".equals(mode) ? "active" : "" %>">상세 검색</button>
+            <button onclick="location.href='search.do?mode=4'" class="<%= "4".equals(mode) ? "active" : "" %>">초대 요리</button>
+        </div>
+        <!-- 우측 컨텐츠 영역 -->
+        <div class="content-area">
+            <% switch(mode) { 
+                case "1": // 키워드 검색 %>
+                <h2>키워드 검색</h2><p>원하는 음식이나 식당 이름을 입력하세요.</p>
+                <form action="search.do" method="get"><input type="hidden" name="type" value="keyword">
+                    <div class="form-box-wide"><ul class="search-list"><li><label>키워드</label><input type="text" name="keyword" placeholder="예: 파스타, 스테이크, 마늘, 소고기"></li></ul>
+                        <div class="search-bar-box"><button type="submit" style="width: 100%;">검색</button></div>
+                    </div></form>
+            <%  break; case "2": // 한상 차림 검색 %>
+                <h2>한상 차림 검색</h2><p>원하는 재료를 입력하면 완벽한 한상을 추천해드립니다. (입력하지 않으면 랜덤 추천)</p>
+                <form action="search.do" method="get"><input type="hidden" name="type" value="simple">
+                    <div class="form-box-wide"><ul class="search-list">
+                            <li><label>주재료 (일품)</label><input type="text" name="mainIngredient" placeholder="예: 닭고기, 소고기"></li>
+                            <li><label>국&찌개 재료</label><input type="text" name="soupIngredient" placeholder="예: 두부, 김치"></li></ul>
+                        <div class="search-bar-box"><button type="submit" style="width: 100%;">한상 차림 추천받기</button></div>
+                    </div></form>
+            <%  break; case "3": // 상세 검색 %>
+                <h2>상세 검색</h2><p>상황에 딱 맞는 완벽한 메뉴를 찾아드립니다.</p>
+                <form action="search.do" method="get"><input type="hidden" name="type" value="detail">
+                    <div class="form-box-wide"><ul class="search-list">
+                            <li><label>출발지</label>
+                            	<input type="text" id="start" placeholder="서울특별시 구로구 경인로 445" readonly>
+                            	<button type="button" onclick="openAddrPopup(document.getElementById('detail_start'))">검색</button>
+                            </li>
+                            <li>
+                            	<label>도착지</label>
+                            	<input type="text" id="end" placeholder="서울특별시 구로구 가마산로 245" readonly>
+                            	<button type="button" onclick="openAddrPopup(document.getElementById('detail_end'))">검색</button>
+                            </li>
+                            <li><label>출발 시간<input type="time" name="depTime"></label></li>
+                            <li><label>식사 시간<input type="time" name="eatTime"></label></li>
+                            <li><label>인원</label><input type="number" name="people" placeholder="4"></li>
+                            <li><label>유형</label><input type="text" name="foodType" placeholder="한식, 중식..."></li>
+                            <li><label>주재료</label><input type="text" name="ingredient" placeholder="쌀"></li></ul>
+                        <div class="search-bar-box"><button type="submit" style="width: 100%;">상세 조건으로 검색</button></div>
+                    </div></form>
+            <%  break; case "4": // 초대 요리 %>
+                <h2>초대 요리 추천</h2><p>손님 초대를 위한 완벽한 메뉴를 계획하세요.</p>
+                <form action="search.do" method="get"><input type="hidden" name="type" value="invite">
+                    <div class="form-box-wide"><ul class="search-list">
+                            <li><label>요리 날짜<input type="date" name="cookingDate"></label></li>
+                            <li><label>식사 시간<input type="time" name="eatTime"></label></li>
+                            <li><label>인원</label><input type="number" name="people" placeholder="예: 4"></li>
+                            <li><label>유형</label><input type="text" name="foodType" placeholder="한식, 양식, 손님접대..."></li></ul>
+                        <div class="search-bar-box"><button type="submit" style="width: 100%;">초대 메뉴 추천받기</button></div>
+                    </div></form>
+            <% break; } %>
+            <!-- 공통 추천 결과 섹션 -->
+            <section class="recommend-section">
+                <%  List<FoodDTO> resultList = (List<FoodDTO>) request.getAttribute("searchResult");
+                    List<Map<String, Object>> hanSangResult = (List<Map<String, Object>>) request.getAttribute("hanSangResult");
+                    String searchKeyword = (String) request.getAttribute("searchKeyword");
+                    boolean searchFailed = request.getAttribute("searchFailed") != null && (Boolean) request.getAttribute("searchFailed");
+                    Integer tempMovetime = (Integer) request.getAttribute("movetime");
+                    int movetime = (tempMovetime != null) ? tempMovetime : 0;
+                    boolean hasResult = (resultList != null && !resultList.isEmpty() && !searchFailed);
+                    boolean hasHanSangResult = (hanSangResult != null && !hanSangResult.isEmpty() && !searchFailed); %>
+                <h3><% if (hasHanSangResult) { %>'<%= searchKeyword %>' 한상 차림 추천<% } 
+                       else if (hasResult) { if (searchKeyword != null && !searchKeyword.trim().isEmpty() && !"null".equals(searchKeyword)) { %>'<%= searchKeyword %>' 검색 결과<% } else { %>오늘의 추천 메뉴<% } } 
+                       else if (searchFailed) { %>검색 결과가 없습니다.<% } else { %>오늘의 추천 메뉴<% } %></h3>
+                <% if ("3".equals(mode) && movetime > 0) { %><p style="font-size: 1.1em; color: #555; margin-top: 10px;">예상 이동 시간: <strong><%= movetime %>분</strong></p><% } %>
+                <ul class="recommend-list">
+                <% if (hasHanSangResult) {
+                      for (Map<String, Object> set : hanSangResult) {
+                           List<FoodDTO> menuList = (List<FoodDTO>) set.get("menuList");
+                           String totalTime = (String) set.get("totalTime");
+                           String setId = (String) set.get("setId");
+                           StringBuilder sb = new StringBuilder();
+                           for (int i = 0; i < menuList.size(); i++) { sb.append(menuList.get(i).getName()); if (i < menuList.size() - 1) sb.append(","); }
+                           String menusParam = URLEncoder.encode(sb.toString(), "UTF-8"); %>
+                   <li><a href="courseDetail.do?setId=<%= setId %>&menus=<%= menusParam %>" style="text-decoration: none; color: inherit; display: block;">
+                            <div class="recommend-card"><div class="recommend-content" style="width: 100%; text-align: left; padding: 15px;">
+                                    <h4 style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">한상 차림 (소요시간: <%= totalTime %>)</h4>
+                                    <ul class="han-sang-list"><% for (FoodDTO food : menuList) { %><li>- <%= food.getName() %> </li><% } %></ul>
+                                </div></div></a></li>
+                <% } } else if (hasResult) {                                
+                        for (FoodDTO food : resultList) {
+                            String startParam = request.getParameter("start");
+                            String endParam = request.getParameter("end");
+                            String linkUrl = "recipeDetail.do?name=" + URLEncoder.encode(food.getName(), "UTF-8");
+                            if (startParam != null && !startParam.isEmpty()) linkUrl += "&start=" + URLEncoder.encode(startParam, "UTF-8");
+                            if (endParam != null && !endParam.isEmpty()) linkUrl += "&end=" + URLEncoder.encode(endParam, "UTF-8"); %>
+                    <li><a href="<%= linkUrl %>" style="text-decoration: none; color: inherit;"><div class="recommend-card">
+                                <div class="recommend-content"><b><%= food.getName() %></b><br><span style="font-size: 14px; color: #666;"><%= food.getTime() %></span></div>
+                                <div class="image-box"><img src="<%= food.getImg() %>" alt="<%= food.getName() %>" onerror="this.src='images/default.jpg'"></div>
+                            </div></a></li>
+                <% } } else if (!searchFailed) { 
+                        // 랜덤 추천 메뉴 로직 (간소화됨)
+                        String[] recommendKeywords = {"일품", "국", "반찬", "튀김", "구이"};
+                        String randomKeyword = recommendKeywords[new java.util.Random().nextInt(recommendKeywords.length)];
+                        String jsonResult = com.dongyang.foodpage.util.FoodApiHelper.searchRecipes(randomKeyword, "category", 1, 20);
+                        List<FoodDTO> recommendList = com.dongyang.foodpage.util.RecipeUtil.parseJsonToFoodList(jsonResult);
+                        if (recommendList != null && !recommendList.isEmpty()) {
+                            java.util.Collections.shuffle(recommendList);
+                            if (recommendList.size() > 3) recommendList = recommendList.subList(0, 3);
+                            for (FoodDTO food : recommendList) { %>
+                    <li><a href="recipeDetail.do?name=<%= URLEncoder.encode(food.getName(), "UTF-8") %>" style="text-decoration: none; color: inherit;"><div class="recommend-card">
+                                <div class="recommend-content"><b><%= food.getName() %></b><br><span style="font-size: 14px; color: #666;"><%= food.getTime() %></span></div>
+                                <div class="image-box"><img src="<%= food.getImg() %>" alt="<%= food.getName() %>" onerror="this.src='images/default.jpg'"></div>
+                            </div></a></li>
+                <% } } else { %><li style="width: 100%; text-align: center; padding: 20px;">오늘의 추천 메뉴를 불러오지 못했습니다.</li><% } } %>
+                </ul>
+            </section>
+        </div>
+    </div>
+</body>
+</html>
